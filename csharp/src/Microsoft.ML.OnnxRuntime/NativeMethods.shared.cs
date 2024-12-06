@@ -566,10 +566,12 @@ namespace Microsoft.ML.OnnxRuntime
             CreateLoraAdapter = (DCreateLoraAdapter)Marshal.GetDelegateForFunctionPointer(api_.CreateLoraAdapter,
                 typeof(DCreateLoraAdapter));
             CreateLoraAdapterFromArray = (DCreateLoraAdapterFromArray)Marshal.GetDelegateForFunctionPointer (api_.CreateLoraAdapterFromArray, typeof(DCreateLoraAdapterFromArray));
-            ReleaseLoraAdapter = (DReleaseLoraAdapter)Marshal.GetDelegateForFunctionPointer(api_.ReleaseLoraAdapter,
-                typeof(DReleaseLoraAdapter));
+            //ReleaseLoraAdapter = (DReleaseLoraAdapter)Marshal.GetDelegateForFunctionPointer(api_.ReleaseLoraAdapter,
+            //    typeof(DReleaseLoraAdapter));
             OrtRunOptionsAddActiveLoraAdapter = (DOrtRunOptionsAddActiveLoraAdapter)Marshal.GetDelegateForFunctionPointer(
                 api_.RunOptionsAddActiveLoraAdapter, typeof(DOrtRunOptionsAddActiveLoraAdapter));
+            SessionOptionsAppendExecutionProvider_VitisAI = (DSessionOptionsAppendExecutionProvider_VitisAI)Marshal.GetDelegateForFunctionPointer(
+                api_.SessionOptionsAppendExecutionProvider_VitisAI, typeof(DSessionOptionsAppendExecutionProvider_VitisAI));
         }
 
         internal class NativeLib
@@ -592,7 +594,8 @@ namespace Microsoft.ML.OnnxRuntime
         public static extern ref OrtApiBase OrtGetApiBase();
 #endif
 
-#region Runtime / Environment API
+        #region Runtime / Environment API
+       
 
         [UnmanagedFunctionPointer(CallingConvention.Winapi)]
         public delegate IntPtr /* OrtStatus* */ DOrtCreateEnv(
@@ -1004,9 +1007,23 @@ namespace Microsoft.ML.OnnxRuntime
             IntPtr /*(void*)*/ user_data);
         public static DOrtRunAsync OrtRunAsync;
 
-#endregion InferenceSession API
+        #endregion InferenceSession API
 
-#region SessionOptions API
+        #region SessionOptions API
+        /// <summary>
+        /// Append a Vitis AI EP instance to the native OrtSessionOptions instance, configured 
+        /// based on given provider options key/value pairs.
+        /// </summary>
+        /// <param name="options">Native OrtSessionOptions instance</param>
+        /// <param name="providerOptions">Configuration key/value pairs for Vitis AI EP</param>
+        [UnmanagedFunctionPointer(CallingConvention.Winapi)]
+        public delegate IntPtr /*(OrtStatus*)*/ DSessionOptionsAppendExecutionProvider_VitisAI(
+            IntPtr /*(OrtSessionOptions*)*/ options,
+            IntPtr[] /*(const char* const *)*/ providerOptionsKeys,
+            IntPtr[] /*(const char* const *)*/ providerOptionsValues,
+            UIntPtr /*(size_t)*/ numKeys);
+
+        public static DSessionOptionsAppendExecutionProvider_VitisAI SessionOptionsAppendExecutionProvider_VitisAI;
 
         [UnmanagedFunctionPointer(CallingConvention.Winapi)]
         public delegate IntPtr /*(OrtStatus*)*/ DOrtCreateSessionOptions(out IntPtr /*(OrtSessionOptions**)*/ sessionOptions);

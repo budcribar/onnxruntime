@@ -411,6 +411,21 @@ namespace Microsoft.ML.OnnxRuntime
 #endif
         }
 
+        /// <summary>
+        /// Append Vitis AI EP to the SessionOptions instance with the specified configuration.
+        /// </summary>
+        /// <param name="providerOptions">A dictionary of key-value pairs for configuring the Vitis AI EP.</param>
+        public void AppendExecutionProvider_VitisAI(Dictionary<string, string> providerOptions)
+        { 
+            ProviderOptionsUpdater.Update(providerOptions, handle, UpdateVitisProviderOptions);
+        }
+
+        private static IntPtr UpdateVitisProviderOptions(IntPtr handle, IntPtr[] keys, IntPtr[] values, UIntPtr count)
+        {
+            return NativeMethods.SessionOptionsAppendExecutionProvider_VitisAI(handle, keys, values, count);
+        }
+
+
         private class ExecutionProviderAppender
         {
             private byte[] _utf8ProviderName;
